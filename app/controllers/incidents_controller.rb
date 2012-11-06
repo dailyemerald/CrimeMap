@@ -2,7 +2,7 @@ class IncidentsController < ApplicationController
   # GET /incidents
   # GET /incidents.json
   def index
-    @incidents = Incident.all
+    @incidents = Incident.all(:order => 'received DESC')
 
     respond_to do |format|
       format.html # index.html.erb
@@ -20,33 +20,5 @@ class IncidentsController < ApplicationController
       format.json { render json: @incident }
     end
   end
-
-  # GET /incidents/new
-  # GET /incidents/new.json
-  def new
-    @incident = Incident.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @incident }
-    end
-  end
-
-  # POST /incidents
-  # POST /incidents.json
-  def create
-    @incident = Incident.new(params[:incident])
-
-    respond_to do |format|
-      if @incident.save
-        format.html { redirect_to @incident, notice: 'Incident was successfully created.' }
-        format.json { render json: @incident, status: :created, location: @incident }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @incident.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
 
 end

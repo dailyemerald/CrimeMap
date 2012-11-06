@@ -1,21 +1,10 @@
-<h1>Listing incidents</h1>
+<a href="/incidents.json">Get the data</a>
 
-<table>
-  <tr>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
+<ul>
 <% @incidents.each do |incident| %>
-  <tr>
-    <td><%= link_to 'Show', incident %></td>
-    <td><%= link_to 'Edit', edit_incident_path(incident) %></td>
-    <td><%= link_to 'Destroy', incident, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-  </tr>
+  <li>
+	<%= incident.received_raw %>: <%= incident.incident_description %> at <%= incident.location %> (ID: <%= incident.cad_id %>)
+  </li>
+
 <% end %>
-</table>
-
-<br />
-
-<%= link_to 'New Incident', new_incident_path %>
+</ul>
