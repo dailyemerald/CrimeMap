@@ -9,6 +9,16 @@ task :epd => :environment do
   #url = 'http://ceapps.eugene-or.gov/epdpubliccad/cadday.aspx?date=11/06/2012'
   page = Nokogiri::HTML(open(url))
 
+  def rebuild_epd_date(weird_date_string)
+    begin
+      date_pieces = weird_date_string.split("/")
+      date_string = [date_pieces[1], date_pieces[0], date_pieces[2]].join("-")
+      return DateTime.parse( date_string )
+    rescue
+      return nil
+    end
+  end
+
   def commit_data_point(data_point)
     
     if data_point.length < 10
@@ -16,7 +26,7 @@ task :epd => :environment do
       return
     end
     
-    if data_point[0][0].nil?
+    if data_point[0][0].nil? #sometimes a nil sneaks in to the first spot to mess up the indexing
       data_point.shift
     end  
     
@@ -34,21 +44,11 @@ task :epd => :environment do
     cleaned_data["priority_raw"]         = data_point[8][1]
     cleaned_data["case_number"]          = data_point[9][1]
     
-    begin
-      cleaned_data["police_response"] = DateTime.parse(cleaned_data["police_response_raw"])
-    rescue
-    end
-    
-    begin
-      cleaned_data["received"] = DateTime.parse(cleaned_data["received_raw"])
-    rescue
-    end
-    
-    if cleaned_data["police_response"].present? and cleaned_data["received"].present?
-      #puts "Response time:", cleaned_data["police_response"]-cleaned_data["received"]
-      #TODO: store this time?
-    end
-    
+    cleaned_data["police_response"] = rebuild_epd_date(cleaned_data["police_response_raw"])
+    cleaned_data["received"]        = rebuild_epd_date(cleaned_data["received_raw"])      
+
+    puts "#{cleaned_data["received_raw"]} -> #{cleaned_data["received"]}"
+        
     cleaned_data["priority"] = cleaned_data["priority_raw"].to_i
     
     cleaned_data["location"] = cleaned_data["location_raw"].gsub("&", " AND ")
@@ -60,7 +60,7 @@ task :epd => :environment do
     
     if @existing_incident
       if @existing_incident.update_attributes(cleaned_data)
-        puts "Updated attrs for existing incident cad_id: #{@existing_incident.cad_id}"
+        puts "Updated existing incident, cad_id: #{@existing_incident.cad_id}"
       else
         puts "Failed to update attrs for existing incident"
       end
@@ -82,6 +82,7 @@ task :epd => :environment do
     unless node.attributes['colspan'].nil?
       if node.attributes['colspan'].value == '4' # this is the horizontal divider between entries, so reset when we see one.
         commit_data_point(data_point)
+        sleep 1
         data_point = []
       end
     end
@@ -90,6 +91,8 @@ task :epd => :environment do
     _attr = exploded.shift
     _data = exploded.join(":").strip
     data_point << [_attr, _data]
+    
+    
   end
   
 end

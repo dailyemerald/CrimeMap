@@ -1,10 +1,30 @@
-<a href="/incidents.json">Get the data</a>
+<div id="map"></div>
 
-<ul>
-<% @incidents.each do |incident| %>
-  <li>
-	<%= incident.received_raw %>: <%= incident.incident_description %> at <%= incident.location %> (ID: <%= incident.cad_id %>)
-  </li>
+<script>
 
-<% end %>
-</ul>
+$.ajax({
+  url: '/incidents.json',
+  dataType: 'json',
+  success: function(incidents) {
+	for(var i=0, l=incidents.length; i<l; i++) {
+      var marker = new google.maps.Marker({
+	    position: new google.maps.LatLng(incidents[i].latitude, incidents[i].longitude),
+		map: window.map,
+		title: incidents[i].received_raw + " | " + incidents[i].incident_description
+	  });
+	}
+  }
+});
+
+var map;
+function initialize() {
+  var mapOptions = {
+    zoom: 14,
+    center: new google.maps.LatLng(44.042748,-123.07668),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  window.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+</script> 

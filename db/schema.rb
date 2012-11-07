@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121106170653) do
+ActiveRecord::Schema.define(:version => 20121106195000) do
 
   create_table "incidents", :force => true do |t|
     t.string   "police_response_raw"
@@ -30,6 +30,8 @@ ActiveRecord::Schema.define(:version => 20121106170653) do
     t.string   "location"
     t.datetime "created_at",           :null => false
     t.datetime "updated_at",           :null => false
+    t.float    "latitude"
+    t.float    "longitude"
   end
 
 end
