@@ -16,9 +16,10 @@
 production:
   adapter: postgresql
   encoding: unicode
-  database: crimemap_development
+  database: crimemap_production
   pool: 5
-  username: g1
+  username: crimemap
+  password: <%= ENV['CRIMEMAP_DB_PASS'] %>
   host: localhost
   port: 5432
   
