@@ -2,11 +2,11 @@ class IncidentsController < ApplicationController
   # GET /incidents
   # GET /incidents.json
   def index
-    @incidents = Incident.where("received > ?", Date.today - 1.days)
+    @incidents = Incident.where("received > ?", Date.today - 3.days).order("received DESC")
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @incidents, :callback => params[:callback] }
+      format.json { render json: @incidents.to_json(:only => [:received, :received_raw, :incident_description, :location, :latitude, :longitude]), :callback => params[:callback] }
     end
   end
 

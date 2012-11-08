@@ -1,20 +1,52 @@
-<div id="map"></div>
+<div id="info">
+	<p><i>BETA.</i> This site pulls logs from the <a href="http://ceapps.eugene-or.gov/epdpubliccad/">Eugene Police CAD</a> every 10 minutes, geocodes them and draws them on a map. More to come.</p>
+</div>
+
+<div id="list-wrapper">
+	<ul>
+	<% @incidents.each do |incident| %>
+		<li>
+			<b><%= incident.incident_description %></b><br>
+			<%= incident.received_raw %><br>
+			<%= incident.location %>
+		</li>
+	<% end %>
+		<li>
+			Ruby on Rails app/scraper by @<a href="http://twitter.com/ivarvong">ivarvong</a><br>
+			Code: <a href="https://github.com/dailyemerald/CrimeMap">github.com/dailyemerald/CrimeMap</a><br>
+			<a href="http://crime.dailyemerald.com/incidents.json?callback=whateveryouwant">JSON!</a> (please be nice, alpha-quality code)
+		</li>
+	</ul>
+</div>
+
+<div id="map">
+	
+</div>
 
 <script>
+
+window.markers = [];
+window.infowindows = {};
 
 $.ajax({
   url: '/incidents.json',
   dataType: 'json',
   success: function(incidents) {
 	for(var i=0, l=incidents.length; i<l; i++) {
-      var marker = new google.maps.Marker({
+  	  var marker = new google.maps.Marker({
 	    position: new google.maps.LatLng(incidents[i].latitude, incidents[i].longitude),
 		map: window.map,
-		title: incidents[i].received_raw + " | " + incidents[i].incident_description
+		title: "<b>"+incidents[i].incident_description+"</b><br>"+incidents[i].received_raw + "<br>" + incidents[i].location
+	  });
+	  google.maps.event.addListener(marker, 'click', function() {
+		
+		 window.infowindow.content = this.title;
+		 window.infowindow.open(window.map, this);
 	  });
 	}
   }
 });
+
 
 var map;
 function initialize() {
@@ -24,7 +56,17 @@ function initialize() {
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
   window.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  window.infowindow = new google.maps.InfoWindow({
+	//incidents[i].received_raw + "<br>" + incidents[i].incident_description + "<br>" + incidents[i].location
+    content: "placeholder content"
+  });
+	
+  
 }
-
 google.maps.event.addDomListener(window, 'load', initialize);
+
+
+
+
+
 </script> 
