@@ -2,7 +2,7 @@ class IncidentsController < ApplicationController
   # GET /incidents
   # GET /incidents.json
   def index
-    @incidents = Incident.where("received > ?", Date.today - 3.days).order("received DESC")
+    @incidents = Incident.where("received > ?", Date.today - 2.days).order("received DESC")
 
     respond_to do |format|
       format.html # index.html.erb
